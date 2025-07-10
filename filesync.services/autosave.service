@@ -6,4 +6,4 @@ After=network.target network-online.target
 
 [Service]
 #ExecStart=/usr/bin/ssh-agent bash -c "ssh-add /home/eve/.ssh/id_rsa; /usr/Scripts/save -a"
-ExecStart=/usr/bin/bash "/usr/bin/Scripts/save -a"
+ExecStart=/usr/bin/bash "/opt/Scripts/save -a"

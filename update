@@ -21,13 +21,13 @@ then
     cd $to_check
     for folder in "$(ls -d -- */)"
     do
-        /usr/bin/Scripts/update "$FOLDERS_TO_CHECK/$folder"
+        /opt/Scripts/update "$FOLDERS_TO_CHECK/$folder"
     done
  done
  # Update any specific directories
  for to_update in $FOLDERS_TO_UPDATE
  do
-    /usr/bin/Scripts/update $to_update
+    /opt/Scripts/update $to_update
  done
 # Just a regular single folder update
 else
