@@ -1,0 +1,12 @@
+#!/bin/bash
+source scripts-config
+
+for REPO in $@ 
+do 
+    ssh $FILE_SERVER_ADDRESS "
+        cd $ARCHIVE_FILE_LOCATION;
+        mv $ARCHIVE_FILE_LOCATION/$REPO $DEFAULT_FILE_LOCATION;    
+    "
+    get $REPO
+    # This is rough but since its passwordless idc. do it a million times for all I care
+done 

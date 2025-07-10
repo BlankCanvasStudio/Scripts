@@ -1,0 +1,16 @@
+#!/bin/bash
+# Kill everything
+sudo fuser -k 1337/tcp 1337/udp
+sudo fuser -k 1338/tcp 1338/udp
+sudo fuser -k 1339/tcp 1330/udp
+
+# Delete everything
+rm *.spec
+rm ./dist/*
+rm -r ./build/*
+
+# Build everything
+python3 client.py --freeze localhost 1337 ransom
+
+# Run everything
+./server.py

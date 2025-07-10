@@ -1,0 +1,4 @@
+#!/bin/bash
+source scripts-config
+mrg login "$MRG_USERNAME" -p "$MRG_PASSWORD"
+

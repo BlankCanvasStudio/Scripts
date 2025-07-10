@@ -1,0 +1,27 @@
+#!/bin/bash
+archive=false
+if [[ "$1" == "-a" ]]
+then 
+  archive=true
+fi 
+source scripts-config
+
+for NEW_FOLDER in $@
+do
+    ssh $FILE_SERVER_ADDRESS "
+    cd $DEFAULT_FILE_LOCATION; 
+    mkdir $NEW_FOLDER; 
+    cd $NEW_FOLDER; 
+    git init --bare; 
+    exit;"
+done
+for NEW_FOLDER in $@
+do
+    if [ "$archive" = true ]
+    then 
+	git clone $FILE_SERVER_ADDRESS$ARCHIVE_FILE_LOCATION/$NEW_FOLDER
+    else
+    	git clone $FILE_SERVER_ADDRESS$DEFAULT_FILE_LOCATION/$NEW_FOLDER
+    fi
+done 
+echo Added reops: $@ and saved copies to $(pwd)

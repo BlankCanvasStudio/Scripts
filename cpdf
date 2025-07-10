@@ -1,0 +1,4 @@
+#!/bin/bash
+img2pdf -o "${@: -1}" "${@:1:$#-1}" 
+# -o "last arg" files="all but last args"
+firefox "${@: -1}"

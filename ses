@@ -1,0 +1,74 @@
+#!/bin/bash
+
+new=false
+kill=false
+attach=true
+list=false
+prune=false
+name=""
+following=""
+command=""
+
+while [ -n "$1" ]
+do
+   case $1 in
+     -n) new=true; shift; name=$1;; 
+     -l) list=true;; 
+     -a) attach=true;; 
+     -r) kill=true;;
+     -c) shift; command=$1;;
+     -p) prune=true;;
+     *) following+="$1 ";;
+   esac
+   shift
+done
+
+if [ "${name: -1}" = " " ]; then
+    name="${name%?}"
+fi
+if [ "${following: -1}" = " " ]; then
+    following="${following%?}"
+fi
+
+if $new; then
+   if [ "$TMUX" == "" ]; then
+      if [ "$name" != "" ]; then
+      	tmux new-session -s $name $command $following
+      else
+      	tmux new-session $command $following
+      fi
+   else
+      if [ "$name" != "" ]; then
+      	tmux new-session -d -s $name $command $following
+      else
+      	tmux new-session -d $command $following
+      fi
+      echo $(tmux list-sessions -F '#{session_name}' | tail -n 1)
+      tmux switch-client -t $(tmux list-sessions -F '#{session_name}' | tail -n 1)
+   fi
+elif [ $kill = true ]; then
+   for single_name in $following; do
+      if [ "$single_name" != "" ]; then
+         if [[ $single_name =~ ^[0-9]* ]]; then
+            tmux kill-session -t "$single_name"
+         elif $(tmux has-session -t $single_name); then
+	    tmux kill-session -t "$single_name" 
+         fi
+      fi
+   done
+elif [[ $attach == true && $list == false && $prune == false ]]; then 
+   if [ "$TMUX" == "" ]; then
+      tmux a -t "$following"
+   else
+       tmux switch-client -t "$following"
+   fi
+fi
+if $prune; then 
+   for sesh in $(tmux list-sessions | grep -v attached | grep -o ^[0-9]*); do
+      tmux kill-session -t $sesh 
+   done
+fi
+if $list; then
+   tmux ls
+fi
+

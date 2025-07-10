@@ -1,0 +1,70 @@
+#!/bin/bash
+
+FOLDERS_TO_UPDATE=( /usr/Scripts )
+FOLDERS_TO_CHECK=()
+
+if [ "$1" == "-a" ] || [ "$1" == "--sync" ]
+
+then
+  cd /home
+  USERS=$(ls -d -- */)
+  for USER in $USERS
+  do
+    # Save all the user's documents folders
+    FOLDERS_TO_CHECK+=("/home/$USER""Documents")
+  done
+  # Loop through all their folders in documents
+  for to_check in $FOLDERS_TO_CHECK
+  do
+    echo "$to_check"
+    cd $to_check
+    for folder in $(ls -d -- */)
+    do
+        echo $to_check/$folder
+        cd $folder
+        /usr/Scripts/save "autosave"
+        cd ..
+        echo ""
+    done
+  done
+  # Update any specific directories
+  for to_update in $FOLDERS_TO_UPDATE
+  do
+    echo $to_update
+    cd $to_update
+    /usr/Scripts/save "autosave" # >> /dev/null
+    echo ""
+  done
+else
+  if [ -z "$@" ]
+  then
+      git add *
+      git commit
+      git push
+      echo Saved
+  else
+    if [ "$(git log -1 --pretty=%B)" == "autosave" ]; 
+    then
+      # squash the last autosave into this commit so that we only maintain either a single autosave or manual saves 
+      # This means we can have a system of auto saving while also maintaining well defined, not breaking commits 
+      # In the event you want to file sync, just add the "autosave" message or use --sync and the commit will get removed when 
+      #   you add workable code
+      # In the event that you save after the autosave and there are no new changes from the autosave to your current save, 
+      #   the commit message will still get changed to your new message, meaning all autosaves get "removed automatically" 
+      git reset --soft HEAD~1
+      git add *
+      git add .gitignore
+      git add .gitlab-ci.y*
+      git commit -m "$@"
+      git push -f
+      echo Saved
+    else
+      git add *
+      git add .gitignore
+      git add .gitlab-ci.y*
+      git commit -m "$@"
+      git push
+      echo Saved
+    fi
+  fi
+fi

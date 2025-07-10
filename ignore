@@ -1,0 +1,6 @@
+#!/bin/bash
+for TO_IGNORE in $@
+do
+    echo "$TO_IGNORE" >> .gitignore 
+done
+echo Now ignoring: $@

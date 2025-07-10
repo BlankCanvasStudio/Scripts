@@ -1,0 +1,2 @@
+#!/bin/bash
+km logs $(km get pods | grep $1 | awk '{print $1}')

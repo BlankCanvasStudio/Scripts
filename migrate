@@ -1,0 +1,16 @@
+#!/bin/bash
+source scripts-config
+for TEMP_FOLDER in $@
+do 
+    mv ${TEMP_FOLDER} ${TEMP_FOLDER}-temp-123456
+    repo ${TEMP_FOLDER} 
+    mv ${TEMP_FOLDER}-temp-123456 ${TEMP_FOLDER} 
+    cd ${TEMP_FOLDER}
+    cd ${TEMP_FOLDER}-temp-123456
+    cp -r * ..
+    cd ..
+    rm -r --force ${TEMP_FOLDER}-temp-123456
+    save "init migration"
+done 
+
+echo Migrated $@

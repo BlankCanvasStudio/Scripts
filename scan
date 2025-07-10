@@ -1,0 +1,11 @@
+#!/bin/bash
+if [[ $1 == "" ]]; then 
+	echo "WARNING! Empty filename. Saving as tmp.jpeg"
+	filename="tmp"
+else
+	filename=$1
+fi
+
+scanimage -y 280 --resolution=300 --format="jpeg" --output-file "$filename.jpeg" --progress
+	# 280mm is ~the height of a normal piece of paper
+display "$filename.jpeg"

@@ -1,0 +1,28 @@
+#!/bin/bash
+source scripts-config
+if [ $# -eq 0 ]
+then
+    if [-d .git ]
+    then 
+        REPO=${PWD##*/}
+        ssh $FILE_SERVER_ADDRESS "
+            cd $DEFAULT_FILE_LOCATION;
+            mv $DEFAULT_FILE_LOCATION/$REPO $ARCHIVE_FILE_LOCATION;   
+        "
+        cd ..
+        rm -rf $REPO
+    else 
+        echo "Please call 'archive' in or on a git repo"
+    fi
+    # This is rough but since its passwordless idc. do it a million times for all I care
+else
+    for REPO in $@ 
+    do 
+        ssh $FILE_SERVER_ADDRESS "
+            cd $DEFAULT_FILE_LOCATION;
+            mv $DEFAULT_FILE_LOCATION/$REPO $ARCHIVE_FILE_LOCATION;    
+        "
+        rm -rf $REPO
+        # This is rough but since its passwordless idc. do it a million times for all I care
+    done 
+fi

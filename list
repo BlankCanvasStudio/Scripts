@@ -1,0 +1,40 @@
+#!/bin/bash
+filename="."
+order=0; do_grep=0; full=0;
+
+while [[ "$#" -gt 0 ]]; do
+    case $1 in
+        -o|--order) order=1;;
+        -g|--grep) do_grep=1; grep="$2"; shift ;;
+        -f|--full) full=1;;
+        *) filename=$1; shift;;
+    esac
+    shift
+done
+if [[ ${filename: -1} != "/" ]]
+then
+  filename="$filename/"
+fi
+
+command="ls -a"
+
+if [[ $full == "1" ]]
+then 
+  command="ls -d"
+  filename="$(pwd)/$filename*"
+  
+fi
+
+results=$($command "$filename")
+
+if [[ $order == 1 ]]
+then 
+  results=$(printf "%s\n" "${results[@]}" | sort -V)
+fi
+if [[ $do_grep == 1 ]]
+then 
+  results=$(printf "%s\n" "${results[@]}" | grep $grep)
+fi
+
+printf "%s\n" "${results[@]}"
+

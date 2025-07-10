@@ -1,0 +1,14 @@
+[Unit]
+Description=A service to keep files up to date with the cloud version
+#OnFailure=failure-notification@%n
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+#ExecStart=/usr/bin/ssh-agent bash -c "ssh-add /home/iroh/.ssh/id_rsa; /usr/Scripts/update -a"
+ExecStart=/usr/bin/bash "/usr/bin/Scripts/update -a"
+
+[Install]
+WantedBy=multi-user.target
+# Making sure we are in run level 2
+	# ie shell can be generated cause arch shell is running

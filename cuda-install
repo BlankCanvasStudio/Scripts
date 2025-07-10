@@ -1,0 +1,13 @@
+#!/bin/bash
+sudo pacman -Syu cuda cuda-tools cudnn
+for a in /sys/bus/pci/devices/*; do echo 0 | sudo tee -a $a/numa_node; done  # Puts a zero in every numa_node file so no error is popped
+
+# Following section crons the changing of numa_node to 0 
+# Identify GPU
+lspci -D | grep NVIDIA
+# Add crontab for root
+sudo crontab -e
+# Make sure this happens at reboot 
+@reboot (echo 0 | tee -a "/sys/bus/pci/devices/<PCI_ID>/numa_node")
+
+

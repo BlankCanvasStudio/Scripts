@@ -1,0 +1,13 @@
+[Unit]
+Description=A service to run the update function every 5 min
+# Wants=network-online.target
+After=network.target network-online.target 
+
+[Timer]
+OnBootSec=2min
+# Chosen somewhat arbitrarily
+OnUnitInactiveSec=5min
+# Run the autosave 5 min after it last completed
+
+[Install]
+WantedBy=timers.target

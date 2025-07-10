@@ -1,0 +1,54 @@
+#!/bin/bash
+
+source scripts-config
+
+set -x
+
+ARCHIVED=false 
+ISI=false
+
+if [[ "$1" == "-a" ]] || [[ "$1" == "archive" ]] || [[ "$1" == "-archive" ]]
+    # This may come back to bite my in the butt cause people will want to use that name
+    then
+        ARCHIVED=true 
+        shift
+fi
+if [[ "$1" == "-i" ]] || [[ "$1" == "--isi" ]]
+    then
+        ISI=true 
+        shift
+fi
+
+if [ $# -eq 0 ]
+then 
+    if [ "$ARCHIVED" = true ]
+    then 
+        ssh $FILE_SERVER_ADDRESS "
+            cd $ARCHIVE_FILE_LOCATION;
+            dir;
+        "
+    elif [ "$ISI" = true ]; then
+        ssh $FILE_SERVER_ADDRESS "
+            cd $ISI_FILE_LOCATION;
+            dir;
+        "
+    else 
+        ssh $FILE_SERVER_ADDRESS "
+            cd $DEFAULT_FILE_LOCATION;
+            dir;
+        "
+    fi
+else 
+    for REPO in $@ 
+    do 
+        if [ $ARCHIVED = true ]
+        then
+            git clone $FILE_SERVER_ADDRESS$ARCHIVE_FILE_LOCATION/${REPO}
+        elif [ $ISI = true ]; then
+            git clone $FILE_SERVER_ADDRESS$ISI_FILE_LOCATION/${REPO}
+        else 
+            git clone $FILE_SERVER_ADDRESS$DEFAULT_FILE_LOCATION/${REPO}
+        fi
+    done 
+    echo got $@
+fi
