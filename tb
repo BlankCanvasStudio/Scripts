@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# Default values
+RADIUS=5
+SEARCH_TERM=""
+PATH_TERMS=()
+SEARCH_DIR="$HOME/Files/toolbox"
+
+# 1. Parse Arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -C)
+            RADIUS="$2"
+            shift 2
+            ;;
+        -x)
+            shift
+            # Capture all remaining arguments as a single search string
+            SEARCH_TERM="$*" 
+            break
+            ;;
+        -l)
+            # Switch to local/current directory
+            SEARCH_DIR="."
+            shift
+            ;;
+        *)
+            PATH_TERMS+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# 2. Extract Search Term if '-x' was not used
+if [[ -z "$SEARCH_TERM" ]]; then
+    length=${#PATH_TERMS[@]}
+    if [[ $length -eq 0 ]]; then
+        echo "Usage:"
+        echo "  tb [-l] [-C lines] <path_1> <path_2> ... <search_term>"
+        echo "  tb [-l] [-C lines] <path_1> <path_2> ... -x <long search string>"
+        exit 1
+    fi
+    
+    # The last path term is actually the search term
+    SEARCH_TERM="${PATH_TERMS[$length-1]}"
+    unset 'PATH_TERMS[$length-1]'
+fi
+
+# 3. Find and Filter Files
+filtered_files=()
+# Use SEARCH_DIR instead of the hardcoded '.'
+while IFS= read -r file; do
+    match=true
+    for term in "${PATH_TERMS[@]}"; do
+        if [[ "$file" != *"$term"* ]]; then
+            match=false
+            break
+        fi
+    done
+    
+    if $match; then
+        filtered_files+=("$file")
+    fi
+done < <(find "$SEARCH_DIR" -type f 2>/dev/null)
+
+if [[ ${#filtered_files[@]} -eq 0 ]]; then
+    echo "No files found matching the path filters in $SEARCH_DIR."
+    exit 0
+fi
+
+# 4. Search within matched files
+for file in "${filtered_files[@]}"; do
+    if grep -q -e "$SEARCH_TERM" "$file" 2>/dev/null; then
+        echo -e "\n\033[1;36m=== $file ===\033[0m"
+        grep --color=always -C "$RADIUS" -e "$SEARCH_TERM" "$file"
+    fi
+done
