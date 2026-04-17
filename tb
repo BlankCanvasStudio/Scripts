@@ -70,8 +70,8 @@ fi
 
 # 4. Search within matched files
 for file in "${filtered_files[@]}"; do
-    if grep -P -q -e "$SEARCH_TERM" "$file" 2>/dev/null; then
+    if grep -q -e "$SEARCH_TERM" "$file" 2>/dev/null; then
         echo -e "\n\033[1;36m=== $file ===\033[0m"
-        grep -P --color=always -C "$RADIUS" -e "$SEARCH_TERM" "$file"
+        grep --color=always -C "$RADIUS" -e "$SEARCH_TERM" "$file"
     fi
 done
