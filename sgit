@@ -1,0 +1,26 @@
+#!/bin/bash
+
+id="$HOME/.ssh2/id_rsa"
+args=()
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+     -i)
+        shift
+	id=$1
+        shift
+        ;;
+     -h)
+        show_help
+	;;
+     *)
+        args+=("$1")
+	shift
+	;;
+    esac
+done
+
+
+GIT_SSH_COMMAND="ssh -i '$id'" git "${args[@]}"
+
+
